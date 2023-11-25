@@ -33,18 +33,21 @@ NOTHING else - this is VERY important):
 
 class Rosie(ConversationalChatAgent):
     chat_history: List[BaseMessage] = []
+    verbose: bool = False
 
     def get_executor(self):
-        return AgentExecutor(agent=self, tools=TOOLS, verbose=True)
+        return AgentExecutor(agent=self, tools=TOOLS, verbose=self.verbose)
 
     @classmethod
-    def create(cls, llm: BaseLanguageModel):
-        return cls.from_llm_and_tools(
+    def create(cls, llm: BaseLanguageModel, *, verbose: bool = False):
+        agent = cls.from_llm_and_tools(
             llm=llm,
             tools=TOOLS,
             system_message=PREFIX,
             human_message=SUFFIX,
         )
+        agent.verbose = verbose
+        return agent
 
     async def ask(self, query: str) -> BaseMessage:
         response = await self.get_executor().ainvoke({"input": query, "chat_history": self.chat_history})
