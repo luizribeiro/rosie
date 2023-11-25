@@ -13,7 +13,7 @@ LLMS = {
 
 
 @run_async
-async def cli(model: str = "gpt-3.5"):
+async def main(model: str = "gpt-3.5"):
     llm = LLMS[model]()
     agent = Rosie.create(llm)
     while prompt := input(">> "):
@@ -21,7 +21,3 @@ async def cli(model: str = "gpt-3.5"):
             break
         response = await agent.ask(prompt)
         print(response["output"])
-
-
-if __name__ == "__main__":
-    typer.run(cli)
