@@ -1,12 +1,20 @@
 import asyncio
+import typer
 
 from langchain.chat_models import ChatOpenAI
 
 from agent import Rosie
+from utils import run_async
 
 
-async def cli():
-    llm = ChatOpenAI(model_name="gpt-3.5-turbo-1106")
+LLMS = {
+    "gpt-3.5": lambda: ChatOpenAI(model_name="gpt-3.5-turbo-1106"),
+}
+
+
+@run_async
+async def cli(model: str = "gpt-3.5"):
+    llm = LLMS[model]()
     agent = Rosie.create(llm)
     while prompt := input(">> "):
         if prompt == "exit":
@@ -16,4 +24,4 @@ async def cli():
 
 
 if __name__ == "__main__":
-    asyncio.run(cli())
+    typer.run(cli)
