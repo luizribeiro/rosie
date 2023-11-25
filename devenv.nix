@@ -5,6 +5,7 @@
     git
     (python310.withPackages (p: [
       p.langchain
+      p.openai
     ]))
   ];
 }
