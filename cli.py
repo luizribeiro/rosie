@@ -14,11 +14,11 @@ app = typer.Typer()
 async def chat(model: str = "gpt-3.5", verbose: bool = False):
     llm = LLMS[model]()
     agent = Rosie.create(llm, verbose=verbose)
-    while prompt := input(">> "):
+    while prompt := input("You: "):
         if prompt == "exit":
             break
         response = await agent.ask(prompt)
-        print(response["output"])
+        print(f"Rosie: {response['output']}")
 
 
 @app.command()
