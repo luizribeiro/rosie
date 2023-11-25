@@ -6,8 +6,12 @@ from config import LLMS
 from utils import run_async
 
 
+app = typer.Typer()
+
+
+@app.command()
 @run_async
-async def main(model: str = "gpt-3.5", verbose: bool = False):
+async def chat(model: str = "gpt-3.5", verbose: bool = False):
     llm = LLMS[model]()
     agent = Rosie.create(llm, verbose=verbose)
     while prompt := input(">> "):
@@ -15,3 +19,9 @@ async def main(model: str = "gpt-3.5", verbose: bool = False):
             break
         response = await agent.ask(prompt)
         print(response["output"])
+
+
+@app.command()
+@run_async
+async def serve():
+    raise NotImplementedError
