@@ -1,4 +1,5 @@
 import asyncio
+import sys
 
 import typer
 import uvicorn
@@ -15,6 +16,10 @@ app = typer.Typer()
 @app.command()
 @run_async
 async def chat(model: str = "gpt-3.5", verbose: bool = False):
+    if model not in LLMS:
+        print(f"Unknown model `{model}`. Here are the available models:")
+        print("\n".join(map(lambda x: f" - {x}", LLMS.keys())))
+        sys.exit(1)
     llm = LLMS[model]()
     agent = Rosie.create(llm, verbose=verbose)
     while prompt := input("You: "):
