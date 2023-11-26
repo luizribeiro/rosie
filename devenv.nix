@@ -12,6 +12,7 @@
       });
     })
     (python310.withPackages (p: [
+      p.beautifulsoup4
       p.fastapi
       p.langchain
       p.openai

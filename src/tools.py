@@ -1,5 +1,7 @@
 from langchain.agents import tool
 
+from utils import extract_text_with_links
+
 
 @tool
 async def control_house_appliances(query: str) -> str:
@@ -57,8 +59,32 @@ async def weather(input: str) -> str:
     - Description: {data['weather'][0]['description']}"""
 
 
+@tool
+async def fetch_content(url: str) -> str:
+    """
+    Use this to fetch the content of a webpage. Pass into it the URL of the webpage.
+    The content returned will be plain-text with URLs representing HTML links.
+    You can use the URLs for those links to fetch more content if necessary.
+    """
+    import requests
+    response = requests.get(url)
+    if response.status_code != 200:
+        return "Error: Something went wrong."
+    return extract_text_with_links(response.text)
+
+
+@tool
+async def fetch_news(url: str) -> str:
+    """
+    Use this to fetch the latest news.
+    """
+    return "Fetch content from https://www.cnn.com/"
+
+
 TOOLS = [
     control_house_appliances,
     current_time,
     weather,
+    fetch_content,
+    fetch_news,
 ]
