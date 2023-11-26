@@ -41,9 +41,8 @@ async def weather(input: str) -> str:
     lat, lon = lat_lon.split(",")
 
     api_key = os.environ.get("WEATHER_API_KEY")
-    api_key = api_key.strip('"').strip("'")
     if not api_key:
-        return "Error: No API key found."
+        return "Error: No OpenWeatherMap API key setup."
 
     url = "https://api.openweathermap.org/data/2.5/weather"
     params = {
