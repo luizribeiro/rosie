@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 
 from agent import Rosie
-from config import LLMS
+from models import LLMS
 
 
 app = FastAPI()

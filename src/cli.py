@@ -4,7 +4,7 @@ import typer
 import uvicorn
 
 from agent import Rosie
-from config import LLMS
+from models import LLMS
 from utils import run_async
 from web import app as web_app
 
