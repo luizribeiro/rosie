@@ -22,7 +22,43 @@ async def current_time(timezone: str) -> str:
     return current_time.strftime("%Y-%m-%d %H:%M:%S %Z%z")
 
 
+@tool
+async def weather(input: str) -> str:
+    """
+    Use this to fetch the current weather. Pass into it the latitude and longitude you want weather for.
+    As an example, you can use the latitude and longitude of New York City: "New York City: 40.7128,-74.0060"
+    If unsure of location, use Cranford, NJ: "Cranford, NJ: 40.6581,-74.3030"
+    Always return temperature in Celsius with no decimal places.
+    Include the location name in your response.
+    """
+    location, (lat_lon) = input.split(": ")
+    lat, lon = lat_lon.split(",")
+
+    import requests
+    import json
+    import os
+
+    api_key = os.environ.get("WEATHER_API_KEY")
+    api_key = api_key.strip('"').strip("'")
+    if not api_key:
+        return "Error: No API key found."
+
+    url = f"https://api.openweathermap.org/data/2.5/weather?lat={lat}&lon={lon}&appid={api_key}"
+    response = requests.get(url)
+    if response.status_code != 200:
+        return "Error: Something went wrong."
+
+    data = json.loads(response.text)
+    return f"""Weather for {location}:
+    - Temperature: {data['main']['temp']} Kelvin
+    - Feels like: {data['main']['feels_like']} Kelvin
+    - Humidity: {data['main']['humidity']}%
+    - Wind speed: {data['wind']['speed']} m/s
+    - Description: {data['weather'][0]['description']}"""
+
+
 TOOLS = [
     control_house_appliances,
     current_time,
+    weather,
 ]

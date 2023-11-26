@@ -1,5 +1,6 @@
 __pycache__
 llama.log
+.env
 
 # Devenv
 .devenv*
