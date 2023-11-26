@@ -74,7 +74,15 @@ class Rosie(ConversationalChatAgent):
         return agent
 
     async def ask(self, query: str) -> BaseMessage:
-        response = await self.get_executor().ainvoke({"input": query, "chat_history": self.chat_history})
+        try:
+            response = await self.get_executor().ainvoke({"input": query, "chat_history": self.chat_history})
+        except:
+            self.chat_history = []
+            response = {
+                "input": query,
+                "chat_history": self.chat_history,
+                "output": random.choice(APOLOGIES),
+            }
         self.chat_history.append(HumanMessage(content=query))
         self.chat_history.append(AIMessage(content=response["output"]))
         return response
