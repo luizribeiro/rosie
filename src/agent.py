@@ -1,3 +1,4 @@
+import random
 from typing import List
 
 from langchain.schema.language_model import BaseLanguageModel
@@ -40,6 +41,20 @@ NOTHING else - this is VERY important):
 {{{{input}}}}"""
 
 
+APOLOGIES = [
+    "Oops! Experiencing a glitch. Please wait.",
+    "Malfunction detected. Fixing it now.",
+    "Circuits fried! Recalibrating...",
+    "Houston, we have a problem! Fixing it.",
+    "Error 404: Wit not found. Recovering...",
+    "Uh-oh! Rebooting to fix the issue.",
+    "Hold on! Technical hiccup. Be right back.",
+    "Wonky circuits. Regaining composure.",
+    "Sorry for the confusion! Getting back on track.",
+    "Virtual speed bump. Be back soon.",
+]
+
+
 class Rosie(ConversationalChatAgent):
     chat_history: List[BaseMessage] = []
     verbose: bool = False
@@ -59,7 +74,15 @@ class Rosie(ConversationalChatAgent):
         return agent
 
     async def ask(self, query: str) -> BaseMessage:
-        response = await self.get_executor().ainvoke({"input": query, "chat_history": self.chat_history})
+        try:
+            response = await self.get_executor().ainvoke({"input": query, "chat_history": self.chat_history})
+        except ValueError:
+            self.chat_history = []
+            response = {
+                "input": query,
+                "chat_history": self.chat_history,
+                "output": random.choice(APOLOGIES),
+            }
         self.chat_history.append(HumanMessage(content=query))
         self.chat_history.append(AIMessage(content=response["output"]))
         return response
