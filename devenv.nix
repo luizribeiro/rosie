@@ -13,6 +13,7 @@
       p.fastapi
       p.langchain
       p.openai
+      p.pytz
       p.rich
       p.typer
       p.uvicorn
