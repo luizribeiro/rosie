@@ -1,6 +1,8 @@
+import json
+
 from langchain.agents import tool
 
-from utils import extract_text_with_links
+from utils import extract_text_with_links, send_mqtt_message
 
 
 @tool
@@ -46,6 +48,7 @@ async def weather(input: str) -> str:
         return "Error: No API key found."
 
     url = f"https://api.openweathermap.org/data/2.5/weather?lat={lat}&lon={lon}&appid={api_key}"
+    # TODO: make this async
     response = requests.get(url)
     if response.status_code != 200:
         return "Error: Something went wrong."
@@ -67,6 +70,7 @@ async def fetch_content(url: str) -> str:
     You can use the URLs for those links to fetch more content if necessary.
     """
     import requests
+    # TODO: make this async
     response = requests.get(url)
     if response.status_code != 200:
         return "Error: Something went wrong."
@@ -81,10 +85,24 @@ async def fetch_news(url: str) -> str:
     return "Fetch content from https://www.cnn.com/"
 
 
+@tool
+async def send_to_user(message: str) -> str:
+    """
+    Use this to send a notification to the user's phone.
+    """
+    payload = {
+        "topic": "rosie",
+        "title": "From Rosie",
+        "message": message,
+    }
+    return send_mqtt_message("ntfy/publish", payload)
+
+
 TOOLS = [
     control_house_appliances,
     current_time,
     weather,
     fetch_content,
     fetch_news,
+    send_to_user,
 ]
