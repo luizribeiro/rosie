@@ -13,11 +13,11 @@
     })
     (python310.withPackages (p: [
       p.aiohttp
+      p.aiomqtt
       p.beautifulsoup4
       p.fastapi
       p.langchain
       p.openai
-      p.paho-mqtt
       p.pytz
       p.rich
       p.typer

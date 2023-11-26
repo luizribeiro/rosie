@@ -100,7 +100,7 @@ async def send_to_user(message: str) -> str:
         "title": "From Rosie",
         "message": message,
     }
-    return send_mqtt_message("ntfy/publish", payload)
+    return await send_mqtt_message("ntfy/publish", payload)
 
 
 TOOLS = [

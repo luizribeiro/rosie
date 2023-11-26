@@ -5,8 +5,8 @@ import re
 from functools import wraps
 from typing import Dict
 
+import aiomqtt
 from bs4 import BeautifulSoup, Comment
-import paho.mqtt.client as mqtt
 
 
 def run_async(func):
@@ -49,17 +49,12 @@ def extract_text_with_links(html: str) -> str:
     return trimmed_content.strip()
 
 
-# TODO: make this async
-def send_mqtt_message(topic: str, payload: Dict[str, str]) -> str:
+async def send_mqtt_message(topic: str, payload: Dict[str, str]) -> str:
     # TODO: make this configurable
     broker_address = "127.0.0.1"
-    if not broker_address:
-        return "Error: No MQTT broker address found."
-    client = mqtt.Client("rosie")
     try:
-        client.connect(broker_address)
-        client.publish(topic, payload=json.dumps(payload))
+        async with aiomqtt.Client(broker_address) as client:
+            await client.publish(topic, payload=json.dumps(payload))
+        return "Success!"
     except Exception as e:
         return f"Error: {e}"
-    client.disconnect()
-    return "Success!"
