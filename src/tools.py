@@ -73,18 +73,15 @@ async def fetch_content(url: str) -> str:
     The content returned will be plain-text with URLs representing HTML links.
     You can use the URLs for those links to fetch more content if necessary.
     """
-    @AsyncTTL(time_to_live=60, maxsize=1024)
-    async def _doit(url):
-        async with aiohttp.ClientSession() as session:
-            async with session.get(url) as response:
-                if response.status != 200:
-                    return "Error: Something went wrong."
-                return extract_text_with_links(await response.text())
-        response = requests.get(url)
-        if response.status_code != 200:
-            return "Error: Something went wrong."
-        return extract_text_with_links(response.text)
-    return await _doit(url)
+    async with aiohttp.ClientSession() as session:
+        async with session.get(url) as response:
+            if response.status != 200:
+                return "Error: Something went wrong."
+            return extract_text_with_links(await response.text())
+    response = requests.get(url)
+    if response.status_code != 200:
+        return "Error: Something went wrong."
+    return extract_text_with_links(response.text)
 
 
 @tool
