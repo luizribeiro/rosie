@@ -1,4 +1,8 @@
 import json
+import os
+import pytz
+import requests
+from datetime import datetime
 
 from langchain.agents import tool
 
@@ -19,8 +23,6 @@ async def current_time(timezone: str) -> str:
     Use the timezone name, not the offset - such as America/New_York.
     If unsure of the location, just default to America/New_York.
     """
-    from datetime import datetime
-    import pytz
     tz = pytz.timezone(timezone)
     current_time = datetime.now(tz)
     return current_time.strftime("%Y-%m-%d %H:%M:%S %Z%z")
@@ -37,10 +39,6 @@ async def weather(input: str) -> str:
     """
     location, (lat_lon) = input.split(": ")
     lat, lon = lat_lon.split(",")
-
-    import requests
-    import json
-    import os
 
     api_key = os.environ.get("WEATHER_API_KEY")
     api_key = api_key.strip('"').strip("'")
@@ -69,7 +67,6 @@ async def fetch_content(url: str) -> str:
     The content returned will be plain-text with URLs representing HTML links.
     You can use the URLs for those links to fetch more content if necessary.
     """
-    import requests
     # TODO: make this async
     response = requests.get(url)
     if response.status_code != 200:
