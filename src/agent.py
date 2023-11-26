@@ -76,7 +76,7 @@ class Rosie(ConversationalChatAgent):
     async def ask(self, query: str) -> BaseMessage:
         try:
             response = await self.get_executor().ainvoke({"input": query, "chat_history": self.chat_history})
-        except:
+        except Exception as ex:
             self.chat_history = []
             response = {
                 "input": query,

@@ -1,9 +1,9 @@
 import json
 import os
-import pytz
-import requests
 from datetime import datetime
 
+import aiohttp
+import pytz
 from langchain.agents import tool
 
 from utils import extract_text_with_links, send_mqtt_message
@@ -45,19 +45,23 @@ async def weather(input: str) -> str:
     if not api_key:
         return "Error: No API key found."
 
-    url = f"https://api.openweathermap.org/data/2.5/weather?lat={lat}&lon={lon}&appid={api_key}"
-    # TODO: make this async
-    response = requests.get(url)
-    if response.status_code != 200:
-        return "Error: Something went wrong."
-
-    data = json.loads(response.text)
-    return f"""Weather for {location}:
-    - Temperature: {data['main']['temp']} Kelvin
-    - Feels like: {data['main']['feels_like']} Kelvin
-    - Humidity: {data['main']['humidity']}%
-    - Wind speed: {data['wind']['speed']} m/s
-    - Description: {data['weather'][0]['description']}"""
+    url = "https://api.openweathermap.org/data/2.5/weather"
+    params = {
+        "lat": lat,
+        "lon": lon,
+        "appid": api_key,
+    }
+    async with aiohttp.ClientSession() as session:
+        async with session.get(url, params=params) as response:
+            if response.status != 200:
+                return "Error: Something went wrong."
+            data = await response.json()
+            return f"""Weather for {location}:
+            - Temperature: {data['main']['temp']} Kelvin
+            - Feels like: {data['main']['feels_like']} Kelvin
+            - Humidity: {data['main']['humidity']}%
+            - Wind speed: {data['wind']['speed']} m/s
+            - Description: {data['weather'][0]['description']}"""
 
 
 @tool
@@ -67,7 +71,11 @@ async def fetch_content(url: str) -> str:
     The content returned will be plain-text with URLs representing HTML links.
     You can use the URLs for those links to fetch more content if necessary.
     """
-    # TODO: make this async
+    async with aiohttp.ClientSession() as session:
+        async with session.get(url) as response:
+            if response.status != 200:
+                return "Error: Something went wrong."
+            return extract_text_with_links(await response.text())
     response = requests.get(url)
     if response.status_code != 200:
         return "Error: Something went wrong."
