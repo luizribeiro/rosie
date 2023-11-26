@@ -4,10 +4,9 @@ from datetime import datetime
 
 import aiohttp
 import pytz
-from cache import AsyncTTL
 from langchain.agents import tool
 
-from utils import extract_text_with_links, send_mqtt_message
+from utils import cached, extract_text_with_links, send_mqtt_message
 
 
 @tool
@@ -30,6 +29,7 @@ async def current_time(timezone: str) -> str:
 
 
 @tool
+@cached
 async def weather(input: str) -> str:
     """
     Use this to fetch the current weather. Pass into it the latitude and longitude you want weather for.
@@ -40,6 +40,7 @@ async def weather(input: str) -> str:
     """
     location, (lat_lon) = input.split(": ")
     lat, lon = lat_lon.split(",")
+    print("calling weather api")
 
     api_key = os.environ.get("WEATHER_API_KEY")
     if not api_key:
@@ -65,6 +66,7 @@ async def weather(input: str) -> str:
 
 
 @tool
+@cached
 async def fetch_content(url: str) -> str:
     """
     Use this to fetch the content of a webpage. Pass into it the URL of the webpage.

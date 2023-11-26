@@ -7,6 +7,7 @@ from typing import Dict
 
 import aiomqtt
 from bs4 import BeautifulSoup, Comment
+from cache import AsyncTTL
 
 
 def run_async(func):
@@ -57,3 +58,11 @@ async def send_mqtt_message(topic: str, payload: Dict[str, str]) -> str:
         return "Success!"
     except Exception as e:
         return f"Error: {e}"
+
+
+def cached(func):
+    @wraps(func)
+    @AsyncTTL(time_to_live=60, maxsize=1024)
+    async def wrapped(*args):
+        return await func(*args)
+    return wrapped
