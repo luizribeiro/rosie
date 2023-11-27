@@ -38,7 +38,10 @@
       packages = forEachSystem
         (system:
           let
-            pkgs = import nixpkgs { inherit system; };
+            pkgs = import nixpkgs {
+              inherit system;
+              config.allowUnfree = true;
+            };
           in
           {
             devenv-up = self.devShells.${system}.default.config.procfileScript;
