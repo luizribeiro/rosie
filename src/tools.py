@@ -83,7 +83,6 @@ async def weather(input: str) -> str:
     """
     location, (lat_lon) = input.split(": ")
     lat, lon = lat_lon.split(",")
-    print("calling weather api")
 
     api_key = os.environ.get("WEATHER_API_KEY")
     if not api_key:
