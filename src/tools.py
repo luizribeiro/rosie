@@ -1,6 +1,7 @@
 import json
 import os
 from datetime import datetime
+from urllib.parse import urlparse, urlunparse, parse_qs
 
 import aiohttp
 import pytz
@@ -10,10 +11,52 @@ from utils import cached, extract_text_with_links, send_mqtt_message
 
 
 @tool
-async def control_house_appliances(query: str) -> str:
-    """Controls house appliances."""
-    print(f"control_house_appliances: {query}")
-    return "Error: Unknown appliance."
+async def home_assistant(raw_url: str) -> str:
+    """
+    Use this to control home automation through Home Assistant.
+
+    The URL passed in should be a valid Home Assistant API call.
+    Use https://home.thepromisedlan.club/ as the host for Home Assistant.
+    You can assume the API token will be populated.
+
+    Here's an overview of the areas, devices and their entities in this smart home:
+
+    # Office
+    - Office 1 Left Window (Roller shade (WM25L-Z))
+       - cover.office_1_left_window
+    - Office 1 Right Window (Roller shade (WM25L-Z))
+       - cover.office_1_right_window
+    - Office 1 Ceiling (Inovelli 2-in-1 switch + dimmer (VZM31-SN))
+       - light.office_1_ceiling
+    - 55" TCL Roku TV (55S555)
+       - media_player.55_tcl_roku_tv
+       - remote.55_tcl_roku_tv
+    """
+    # TODO: fetch entities above from the API
+    # TODO: allow for GET requests too for fetching state
+    # TODO: allow for LLM to provide the data (so multiple entity_ids are supported)
+    hass_token = os.environ.get("HASS_TOKEN")
+
+    parsed_url = urlparse(raw_url)
+    url = urlunparse(parsed_url._replace(query=''))
+    data = parse_qs(parsed_url.query)
+
+    headers = {
+        "Authorization": f"Bearer {hass_token}",
+        "Content-Type": "application/json",
+    }
+    json_data = json.dumps(data)
+
+    try:
+        async with aiohttp.ClientSession() as session:
+            async with session.post(url, data=json_data, headers=headers) as response:
+                if response.status != 200:
+                    text = await response.text()
+                    return "Error: Something went wrong."
+                data = await response.json()
+                return json.dumps(data, indent=2)
+    except Exception as e:
+        return "Error: Something went wrong."
 
 
 @tool
@@ -106,7 +149,7 @@ async def send_to_user(message: str) -> str:
 
 
 TOOLS = [
-    control_house_appliances,
+    home_assistant,
     current_time,
     weather,
     fetch_content,
