@@ -13,6 +13,27 @@
   outputs = { self, nixpkgs, devenv, systems, ... } @ inputs:
     let
       forEachSystem = nixpkgs.lib.genAttrs (import systems);
+      dependencies = pkgs: with pkgs; [
+        git
+        (ollama.override {
+          llama-cpp = (llama-cpp.override {
+            cudaSupport = true;
+            openblasSupport = false;
+          });
+        })
+        (python310.withPackages (p: [
+          p.aiohttp
+          p.aiomqtt
+          p.beautifulsoup4
+          p.fastapi
+          p.langchain
+          p.openai
+          p.pytz
+          p.rich
+          p.typer
+          p.uvicorn
+        ]))
+      ];
     in
     {
       packages = forEachSystem (system: {
@@ -31,7 +52,10 @@
             default = devenv.lib.mkShell {
               inherit inputs pkgs;
               modules = [
-                ./devenv.nix
+                {
+                  dotenv.enable = true;
+                  packages = dependencies pkgs;
+                }
               ];
             };
           });
