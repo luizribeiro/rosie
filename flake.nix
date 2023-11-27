@@ -14,7 +14,6 @@
     let
       forEachSystem = nixpkgs.lib.genAttrs (import systems);
       dependencies = pkgs: with pkgs; [
-        git
         (ollama.override {
           llama-cpp = (llama-cpp.override {
             cudaSupport = true;
@@ -36,9 +35,28 @@
       ];
     in
     {
-      packages = forEachSystem (system: {
-        devenv-up = self.devShells.${system}.default.config.procfileScript;
-      });
+      packages = forEachSystem
+        (system:
+          let
+            pkgs = import nixpkgs { inherit system; };
+          in
+          {
+            devenv-up = self.devShells.${system}.default.config.procfileScript;
+            rosie = pkgs.stdenv.mkDerivation {
+              name = "rosie";
+              src = ./.;
+              nativeBuildInputs = [ pkgs.makeWrapper ];
+              buildInputs = dependencies pkgs;
+              buildPhase = ''
+                mkdir -p $out/{bin,share/rosie}
+                cp -r src $out/share/rosie/src
+                cp rosie $out/share/rosie/rosie
+                wrapProgram $out/share/rosie/rosie \
+                  --prefix PYTHONPATH : $out/share/rosie/src
+                ln -s $out/share/rosie/rosie $out/bin/rosie
+              '';
+            };
+          });
 
       devShells = forEachSystem
         (system:

@@ -2,6 +2,7 @@ __pycache__
 llama.log
 .env
 .direnv
+result
 
 # Devenv
 .devenv*
