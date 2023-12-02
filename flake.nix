@@ -33,6 +33,9 @@
           p.uvicorn
         ]))
       ];
+      devDependencies = pkgs: with pkgs; [
+        nodePackages.pyright
+      ];
     in
     {
       packages = forEachSystem
@@ -75,7 +78,8 @@
               modules = [
                 {
                   dotenv.enable = true;
-                  packages = dependencies pkgs;
+                  packages = (dependencies pkgs)
+                    ++ (devDependencies pkgs);
                 }
               ];
             };
