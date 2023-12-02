@@ -72,6 +72,10 @@ async def current_time(timezone: str) -> str:
     return current_time.strftime("%Y-%m-%d %H:%M:%S %Z%z")
 
 
+def kelvin_to_celsius(kelvin: float) -> float:
+    return kelvin - 273.15
+
+
 @tool
 @cached
 async def weather(input: str) -> str:
@@ -101,10 +105,10 @@ async def weather(input: str) -> str:
                 return "Error: Something went wrong."
             data = await response.json()
             return f"""Weather for {location}:
-            - Temperature: {data['main']['temp']} Kelvin
-            - Feels like: {data['main']['feels_like']} Kelvin
-            - Humidity: {data['main']['humidity']}%
-            - Wind speed: {data['wind']['speed']} m/s
+            - Temperature: {kelvin_to_celsius(data['main']['temp']):.1f} Celsius
+            - Feels like: {kelvin_to_celsius(data['main']['feels_like']):.1f} Celsius
+            - Humidity: {data['main']['humidity']:.1f}%
+            - Wind speed: {data['wind']['speed']:.1f} m/s
             - Description: {data['weather'][0]['description']}"""
 
 
