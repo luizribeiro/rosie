@@ -13,4 +13,4 @@ agent = Rosie.create(llm)
 @app.get("/query")
 async def query(prompt: str, conversation_id: str = "default"):
     response = await agent.ask(prompt, conversation_id)
-    return {"response": response["output"]}
+    return {"response": response.content}

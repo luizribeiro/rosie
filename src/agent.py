@@ -1,5 +1,5 @@
 import random
-from typing import Dict, List
+from typing import Dict, List, cast
 
 from langchain.schema.language_model import BaseLanguageModel
 from langchain.agents import ConversationalChatAgent, AgentExecutor
@@ -66,7 +66,7 @@ class Rosie(ConversationalChatAgent):
         return self.chat_history.get(conversation_id, [])
 
     @classmethod
-    def create(cls, llm: BaseLanguageModel, *, verbose: bool = False):
+    def create(cls, llm: BaseLanguageModel, *, verbose: bool = False) -> "Rosie":
         agent = cls.from_llm_and_tools(
             llm=llm,
             tools=TOOLS,
@@ -74,14 +74,14 @@ class Rosie(ConversationalChatAgent):
             human_message=SUFFIX,
         )
         agent.verbose = verbose
-        return agent
+        return cast(Rosie, agent)
 
     async def ask(self, query: str, conversation_id: str = "default") -> BaseMessage:
         chat_history = self.chat_history.get(conversation_id, [])
 
         try:
             response = await self.get_executor().ainvoke({"input": query, "chat_history": chat_history})
-        except Exception as ex:
+        except Exception:
             chat_history = []
             response = {
                 "input": query,
@@ -89,8 +89,9 @@ class Rosie(ConversationalChatAgent):
                 "output": random.choice(APOLOGIES),
             }
 
+        ai_response = AIMessage(content=response["output"])
         chat_history.append(HumanMessage(content=query))
-        chat_history.append(AIMessage(content=response["output"]))
+        chat_history.append(ai_response)
         self.chat_history[conversation_id] = chat_history
 
-        return response
+        return ai_response

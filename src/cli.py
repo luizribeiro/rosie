@@ -1,4 +1,3 @@
-import asyncio
 import sys
 
 import typer
@@ -26,7 +25,7 @@ async def chat(model: str = "gpt-3.5", verbose: bool = False):
         if prompt == "exit":
             break
         response = await agent.ask(prompt)
-        print(f"Rosie: {response['output']}")
+        print(f"Rosie: {response.content}")
 
 
 @app.command()

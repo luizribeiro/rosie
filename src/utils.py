@@ -51,7 +51,7 @@ def extract_text_with_links(html: str) -> str:
 
 
 async def send_mqtt_message(topic: str, payload: Dict[str, str]) -> str:
-    broker_address = os.environ.get("MQTT_HOST")
+    broker_address = os.environ.get("MQTT_HOST", "127.0.0.1")
     try:
         async with aiomqtt.Client(broker_address) as client:
             await client.publish(topic, payload=json.dumps(payload))

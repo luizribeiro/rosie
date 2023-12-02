@@ -1,9 +1,11 @@
 import json
 import os
 from datetime import datetime
+from typing import Sequence, cast
 from urllib.parse import urlparse, urlunparse, parse_qs
 
 import aiohttp
+from langchain.agents.tools import BaseTool
 import pytz
 from langchain.agents import tool
 
@@ -122,7 +124,7 @@ async def fetch_content(url: str) -> str:
 
 
 @tool
-async def fetch_news(_: str) -> str:
+async def fetch_news(url: str) -> str:
     """
     Use this to fetch the latest news.
     """
@@ -130,9 +132,12 @@ async def fetch_news(_: str) -> str:
 
 
 @tool
-async def send_to_user(message: str) -> str:
+async def notify_phone(message: str) -> str:
     """
-    Use this to send a notification to the user's phone.
+    Use this to send content or notifications to the user's phone when the user requests
+    you to send something to their phone.
+
+    Do not send notifications without the user requesting for it.
     """
     payload = {
         "topic": "rosie",
@@ -142,11 +147,11 @@ async def send_to_user(message: str) -> str:
     return await send_mqtt_message("ntfy/publish", payload)
 
 
-TOOLS = [
+TOOLS: Sequence[BaseTool] = cast(Sequence[BaseTool], [
     home_assistant,
     current_time,
     weather,
     fetch_content,
     fetch_news,
-    send_to_user,
-]
+    notify_phone,
+])
