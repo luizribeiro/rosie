@@ -51,11 +51,10 @@ async def home_assistant(raw_url: str) -> str:
         async with aiohttp.ClientSession() as session:
             async with session.post(url, data=json_data, headers=headers) as response:
                 if response.status != 200:
-                    text = await response.text()
                     return "Error: Something went wrong."
                 data = await response.json()
                 return json.dumps(data, indent=2)
-    except Exception as e:
+    except Exception:
         return "Error: Something went wrong."
 
 
@@ -120,14 +119,10 @@ async def fetch_content(url: str) -> str:
             if response.status != 200:
                 return "Error: Something went wrong."
             return extract_text_with_links(await response.text())
-    response = requests.get(url)
-    if response.status_code != 200:
-        return "Error: Something went wrong."
-    return extract_text_with_links(response.text)
 
 
 @tool
-async def fetch_news(url: str) -> str:
+async def fetch_news(_: str) -> str:
     """
     Use this to fetch the latest news.
     """
