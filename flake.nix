@@ -17,8 +17,6 @@
         (ollama.override {
           llama-cpp = (llama-cpp.override {
             cudaSupport = true;
-            openblasSupport = false;
-            stdenv = gcc11Stdenv;
           });
         })
         (python310.withPackages (p: [
