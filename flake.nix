@@ -24,6 +24,16 @@
                   "test_convert_pydantic_to_openai_function_nested"
                 ];
               });
+              openai = super.watchfiles.overridePythonAttrs (old: {
+                disabledTests = old.disabledTests ++ [
+                  "test_copy_build_request"
+                ];
+              });
+              watchfiles = super.watchfiles.overridePythonAttrs (old: {
+                disabledTests = old.disabledTests ++ [
+                  "test_ignore_permission_denied"
+                ];
+              });
             };
           };
         })
