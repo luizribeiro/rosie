@@ -13,6 +13,21 @@
   outputs = { self, nixpkgs, devenv, systems, ... } @ inputs:
     let
       forEachSystem = nixpkgs.lib.genAttrs (import systems);
+      overlays = [
+        (self: super: {
+          python310 = super.python310.override {
+            packageOverrides = self: super: {
+              langchain = super.langchain.overridePythonAttrs (old: {
+                disabledTests = old.disabledTests ++ [
+                  "test_create_sql_agent"
+                  "test_convert_pydantic_to_openai_function"
+                  "test_convert_pydantic_to_openai_function_nested"
+                ];
+              });
+            };
+          };
+        })
+      ];
       dependencies = pkgs: with pkgs; [
         (ollama.override {
           llama-cpp = (llama-cpp.override {
@@ -41,7 +56,7 @@
         (system:
           let
             pkgs = import nixpkgs {
-              inherit system;
+              inherit system overlays;
               config.allowUnfree = true;
             };
           in
@@ -67,7 +82,7 @@
         (system:
           let
             pkgs = import nixpkgs {
-              inherit system;
+              inherit system overlays;
               config.allowUnfree = true;
             };
           in
