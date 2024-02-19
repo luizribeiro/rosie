@@ -24,7 +24,7 @@
                   "test_convert_pydantic_to_openai_function_nested"
                 ];
               });
-              openai = super.watchfiles.overridePythonAttrs (old: {
+              openai = super.openai.overridePythonAttrs (old: {
                 disabledTests = old.disabledTests ++ [
                   "test_copy_build_request"
                 ];
