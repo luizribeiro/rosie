@@ -1,4 +1,4 @@
-from langchain.chat_models import ChatOllama, ChatOpenAI
+from langchain_community.chat_models import ChatOllama, ChatOpenAI
 from typing import Optional, TypeVar
 
 

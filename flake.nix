@@ -15,7 +15,7 @@
       forEachSystem = nixpkgs.lib.genAttrs (import systems);
       overlays = [
         (self: super: {
-          python310 = super.python310.override {
+          python311 = super.python311.override {
             packageOverrides = self: super: {
               langchain = super.langchain.overridePythonAttrs (old: {
                 disabledTests = old.disabledTests ++ [
@@ -44,12 +44,13 @@
             cudaSupport = true;
           });
         })
-        (python310.withPackages (p: [
+        (python311.withPackages (p: [
           p.aiohttp
           p.aiomqtt
           p.beautifulsoup4
           p.fastapi
           p.langchain
+          p.langchain-community
           p.openai
           p.pytz
           p.rich
