@@ -3,6 +3,7 @@
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     systems.url = "github:nix-systems/default";
     devenv.url = "github:cachix/devenv";
+    poetry2nix.url = "github:nix-community/poetry2nix";
   };
 
   nixConfig = {
@@ -10,8 +11,9 @@
     extra-substituters = "https://devenv.cachix.org";
   };
 
-  outputs = { self, nixpkgs, devenv, systems, ... } @ inputs:
-    let
+  outputs = { self, nixpkgs, devenv, systems, poetry2nix, ... } @ inputs:
+    /*
+      let
       forEachSystem = nixpkgs.lib.genAttrs (import systems);
       overlays = [
         (self: super: {
@@ -59,8 +61,8 @@
       devDependencies = pkgs: with pkgs; [
         pyright
       ];
-    in
-    {
+      in
+      {
       packages = forEachSystem
         (system:
           let
@@ -107,5 +109,22 @@
               ];
             };
           });
+      };
+    */
+    let
+      system = "x86_64-linux";
+      pkgs = nixpkgs.legacyPackages.${system};
+      p2n = poetry2nix.lib.mkPoetry2Nix { inherit pkgs; };
+      rosie = p2n.mkPoetryApplication {
+        projectDir = ./.;
+        preferWheels = true;
+      };
+    in
+    {
+      apps.${system}.default = {
+        type = "app";
+        # replace <script> with the name in the [tool.poetry.scripts] section of your pyproject.toml
+        program = "${rosie}/bin/rosie";
+      };
     };
 }
