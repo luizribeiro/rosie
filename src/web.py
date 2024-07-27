@@ -6,7 +6,7 @@ from models import LLMS
 
 app = FastAPI()
 # TODO: take this from a config
-llm = LLMS["gpt-4"]()
+llm = LLMS["llama3.1-70b"]()
 agent = Rosie.create(llm)
 
 

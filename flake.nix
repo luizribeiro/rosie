@@ -40,9 +40,7 @@
       ];
       dependencies = pkgs: with pkgs; [
         (ollama.override {
-          llama-cpp = (llama-cpp.override {
-            cudaSupport = true;
-          });
+          acceleration = "cuda";
         })
         (python311.withPackages (p: [
           p.aiohttp
@@ -59,7 +57,7 @@
         ]))
       ];
       devDependencies = pkgs: with pkgs; [
-        nodePackages.pyright
+        pyright
       ];
     in
     {
