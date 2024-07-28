@@ -9,7 +9,7 @@ from langchain.agents.tools import BaseTool
 import pytz
 from langchain.agents import tool
 
-from utils import cached, extract_text_with_links, send_mqtt_message
+from utils import cached, extract_text_with_links, fetch_url, send_mqtt_message
 
 
 @tool
@@ -120,11 +120,7 @@ async def fetch_content(url: str) -> str:
     The content returned will be plain-text with URLs representing HTML links.
     You can use the URLs for those links to fetch more content if necessary.
     """
-    async with aiohttp.ClientSession() as session:
-        async with session.get(url) as response:
-            if response.status != 200:
-                return "Error: Something went wrong."
-            return extract_text_with_links(await response.text())
+    return await fetch_url(url)
 
 
 @tool
@@ -132,7 +128,7 @@ async def fetch_news(url: str) -> str:
     """
     Use this to fetch the latest news.
     """
-    return "Fetch content from https://www.cnn.com/"
+    return await fetch_url("https://www.cnn.com/")
 
 
 @tool

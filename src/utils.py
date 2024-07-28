@@ -5,6 +5,7 @@ import re
 from functools import wraps
 from typing import Dict
 
+import aiohttp
 import aiomqtt
 from bs4 import BeautifulSoup, Comment
 from cache import AsyncTTL
@@ -66,3 +67,10 @@ def cached(func):
     async def wrapped(*args):
         return await func(*args)
     return wrapped
+
+async def fetch_url(url: str) -> str:
+    async with aiohttp.ClientSession() as session:
+        async with session.get(url) as response:
+            if response.status != 200:
+                return "Error: Something went wrong."
+            return extract_text_with_links(await response.text())
