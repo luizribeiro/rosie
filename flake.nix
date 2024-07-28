@@ -4,7 +4,7 @@
     poetry2nix.url = "github:nix-community/poetry2nix";
   };
 
-  outputs = { nixpkgs, poetry2nix, ... }:
+  outputs = { self, nixpkgs, poetry2nix, ... }:
     let
       system = "x86_64-linux";
       pkgs = nixpkgs.legacyPackages.${system};
@@ -22,8 +22,11 @@
 
       apps.${system}.default = {
         type = "app";
-        # replace <script> with the name in the [tool.poetry.scripts] section of your pyproject.toml
         program = "${rosie}/bin/rosie";
+      };
+
+      devShells.${system}.default = pkgs.mkShell {
+        inputsFrom = [ self.packages.${system}.rosie ];
       };
     };
 }
