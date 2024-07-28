@@ -9,7 +9,7 @@ from langchain.agents.tools import BaseTool
 import pytz
 from langchain.agents import tool
 
-from utils import cached, extract_text_with_links, fetch_url, send_mqtt_message
+from utils import cached, fetch_url, send_mqtt_message
 
 
 @tool
